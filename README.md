@@ -26,7 +26,7 @@ lappy:~ root$ ./fastlycli service -service test.com
 ```
 
 ```
-bigserver:~ root$ fastlycli -h
+lappy:~ root$ fastlycli -h
 NAME:
    fastlycli - Manage Fastly CDN Services via the cli
 
