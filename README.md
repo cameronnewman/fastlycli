@@ -33,8 +33,24 @@ Service test.com successfully purged
 ```
 
 ```
+<<<<<<< HEAD
 lappy:~ root$ fastlycli -h
 AME:
+=======
+lappy:~ root$ ./fastlycli service -service test.com
+{
+  "id":"SU1Z0isxPaozGVKXdv0eY",
+  "name":"test.com",
+  "customer_id":"sjshjs9e",
+  "versions": null
+  ]
+}
+```
+
+```
+lappy:~ root$ fastlycli -h
+NAME:
+>>>>>>> 1caa535fde7b9e94a5fce8e4b8a10141a70bfe63
    fastlycli - Manage Fastly CDN Services via the cli
 
 USAGE:
