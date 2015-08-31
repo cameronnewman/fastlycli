@@ -26,9 +26,6 @@ lappy:~ root$ ./fastlycli service domains -service test.com
 ```
 ```
 lappy:~ root$ ./fastlycli purge -service test.com *
-Getting test.com service details
-Service test.com found. ID=xxxxxxxxxxx
-Purging test.com service
 Service test.com successfully purged
 ```
 
@@ -39,15 +36,15 @@ NAME:
 
 USAGE:
    fastlycli [global options] command [command options] [arguments...]
-   
+
 VERSION:
    0.8.0
-   
+
 COMMANDS:
    service	Get Service Details
    purge	Purge objects from the CDN
    help, h	Shows a list of commands or help for one command
-   
+
 GLOBAL OPTIONS:
    --help, -h		show help
    --version, -v	print the version
