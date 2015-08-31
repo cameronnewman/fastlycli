@@ -21,7 +21,7 @@ func NewFastlyClient() *Client {
 
 func (c *Client) GetServiceDetails(serviceName string) {
 
-	if (*c).CheckAPIKey() {
+	if (*c).checkAPIKey() {
 
 		var result SearchResultModel
 		result = (*c).lookupServiceByName(serviceName)
@@ -66,7 +66,7 @@ func (c *Client) GetServiceDetails(serviceName string) {
 
 func (c *Client) GetServiceDomains(serviceName string) {
 
-	if (*c).CheckAPIKey() {
+	if (*c).checkAPIKey() {
 
 		var result SearchResultModel
 		result = (*c).lookupServiceByName(serviceName)
@@ -111,7 +111,7 @@ func (c *Client) GetServiceDomains(serviceName string) {
 
 func (c *Client) GetServiceBackends(serviceName string) {
 
-	if (*c).CheckAPIKey() {
+	if (*c).checkAPIKey() {
 
 		var result SearchResultModel
 		result = (*c).lookupServiceByName(serviceName)
@@ -156,7 +156,7 @@ func (c *Client) GetServiceBackends(serviceName string) {
 
 func (c *Client) PurgeObjects(serviceName string, objects string) {
 
-	if (*c).CheckAPIKey() {
+	if (*c).checkAPIKey() {
 
 		var service SearchResultModel
 		service = (*c).lookupServiceByName(serviceName)
@@ -185,7 +185,7 @@ func (c *Client) PurgeObjects(serviceName string, objects string) {
 	}
 }
 
-func (c *Client) CheckAPIKey() bool {
+func (c *Client) checkAPIKey() bool {
 	if os.Getenv("FASTLYAPIKEY") == "" {
 		println("Fastly API key not set. Please export $FASTLYAPIKEY=x")
 		return false
@@ -199,7 +199,7 @@ func (c *Client) lookupServiceByName(serviceName string) SearchResultModel {
 
 	var service SearchResultModel
 
-	if (*c).CheckAPIKey() {
+	if (*c).checkAPIKey() {
 
 		println("Searching for " + serviceName)
 
