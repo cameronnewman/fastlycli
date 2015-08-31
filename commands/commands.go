@@ -12,6 +12,12 @@ func Excute() {
 	app.Name = "fastlycli"
 	app.Usage = "Manage Fastly CDN Services via the cli"
 	app.Version = "0.8.0"
+	app.Flags = []cli.Flag{
+		cli.BoolFlag{
+			Name:  "verbose",
+			Usage: "enable verbose logging",
+		},
+	}
 	app.Commands = []cli.Command{
 		{
 			Name:  "service",

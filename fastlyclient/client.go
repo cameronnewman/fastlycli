@@ -28,7 +28,7 @@ func (c *Client) GetServiceDetails(serviceName string) {
 
 		if result.ID != "" {
 
-			println("Getting " + serviceName + " service details")
+			//println("Getting " + serviceName + " service details")
 
 			//GET /service/search?name={serviceName}
 			req, err := http.NewRequest("GET", FastlyAPIEndPoint+"/service/"+result.ID+"/details", nil)
@@ -73,7 +73,7 @@ func (c *Client) GetServiceDomains(serviceName string) {
 
 		if result.ID != "" {
 
-			println("Getting " + serviceName + " service domains")
+			//println("Getting " + serviceName + " service domains")
 
 			//GET /service/search?name={serviceName}
 			req, err := http.NewRequest("GET", FastlyAPIEndPoint+"/service/"+result.ID+"/details", nil)
@@ -118,7 +118,7 @@ func (c *Client) GetServiceBackends(serviceName string) {
 
 		if result.ID != "" {
 
-			println("Getting " + serviceName + " service domains")
+			//println("Getting " + serviceName + " service domains")
 
 			//GET /service/search?name={serviceName}
 			req, err := http.NewRequest("GET", FastlyAPIEndPoint+"/service/"+result.ID+"/details", nil)
@@ -162,7 +162,7 @@ func (c *Client) PurgeObjects(serviceName string, objects string) {
 		service = (*c).lookupServiceByName(serviceName)
 
 		if service.ID != "" {
-			println("Purging " + serviceName + " service")
+			//println("Purging " + serviceName + " service")
 
 			//POST /service/ekjhsdfkjhsdfouejk/purge_all
 			req, err := http.NewRequest("POST", FastlyAPIEndPoint+"/service/"+service.ID+"/purge_all", nil)
@@ -201,7 +201,7 @@ func (c *Client) lookupServiceByName(serviceName string) SearchResultModel {
 
 	if (*c).checkAPIKey() {
 
-		println("Searching for " + serviceName)
+		//println("Searching for " + serviceName)
 
 		//GET /service/search?name={serviceName}
 		req, err := http.NewRequest("GET", FastlyAPIEndPoint+"/service/search?name="+serviceName, nil)
@@ -219,7 +219,7 @@ func (c *Client) lookupServiceByName(serviceName string) SearchResultModel {
 		if response.Status == "200 OK" {
 
 			err := json.Unmarshal(body, &service)
-			println("Service " + serviceName + " found. ID=" + service.ID)
+			//println("Service " + serviceName + " found. ID=" + service.ID)
 
 			if err != nil {
 				panic(err)
