@@ -1,11 +1,13 @@
 package commands
 
 import (
+	"os"
+
 	"github.com/cameronnewman/fastlycli/fastlyclient"
 	"github.com/codegangsta/cli"
-	"os"
 )
 
+//Excute main section
 func Excute() {
 
 	app := cli.NewApp()
