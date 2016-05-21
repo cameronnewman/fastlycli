@@ -1,5 +1,6 @@
 package fastlyclient
 
+//SearchResultModel Search result model
 type SearchResultModel struct {
 	Comment    string `json:"comment"`
 	CustomerID string `json:"customer_id"`
@@ -22,11 +23,13 @@ type SearchResultModel struct {
 	} `json:"versions"`
 }
 
+//PurgeObjectResultModel Result model for purge
 type PurgeObjectResultModel struct {
 	Status string `json:"status"`
 	ID     string `json:"id"`
 }
 
+//ServiceModel Service Model
 type ServiceModel struct {
 	ActiveVersion struct {
 		Active   bool `json:"active"`
@@ -94,9 +97,9 @@ type ServiceModel struct {
 		ResponseObjects []interface{} `json:"response_objects"`
 		ServiceID       string        `json:"service_id"`
 		Settings        struct {
-			General_defaultHost string `json:"general.default_host"`
-			General_defaultPci  int    `json:"general.default_pci"`
-			General_defaultTTL  int    `json:"general.default_ttl"`
+			GeneralDefaultHost string `json:"general.default_host"`
+			GeneralDefaultPci  int    `json:"general.default_pci"`
+			GeneralDefaultTTL  int    `json:"general.default_ttl"`
 		} `json:"settings"`
 		Staging   interface{}   `json:"staging"`
 		Testing   interface{}   `json:"testing"`
@@ -173,9 +176,9 @@ type ServiceModel struct {
 		ResponseObjects []interface{} `json:"response_objects"`
 		ServiceID       string        `json:"service_id"`
 		Settings        struct {
-			General_defaultHost string `json:"general.default_host"`
-			General_defaultPci  int    `json:"general.default_pci"`
-			General_defaultTTL  int    `json:"general.default_ttl"`
+			GeneralDefaultHost string `json:"general.default_host"`
+			GeneralDefaultPci  int    `json:"general.default_pci"`
+			GeneralDefaultTTL  int    `json:"general.default_ttl"`
 		} `json:"settings"`
 		Staging   interface{}   `json:"staging"`
 		Testing   interface{}   `json:"testing"`

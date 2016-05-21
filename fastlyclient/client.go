@@ -7,18 +7,23 @@ import (
 	"os"
 )
 
+//FastlyAPIEndPoint Default API hostname
 const FastlyAPIEndPoint = "https://api.fastly.com"
 
+//Client struct for client connection
 type Client struct {
 }
 
+//FastlyAPIKey api key
 var FastlyAPIKey string
 
+//NewFastlyClient constructor
 func NewFastlyClient() *Client {
 	fastlyClient := &Client{}
 	return fastlyClient
 }
 
+//GetServiceDetails Get Fastly service by friendly name
 func (c *Client) GetServiceDetails(serviceName string) {
 
 	if (*c).checkAPIKey() {
@@ -27,8 +32,6 @@ func (c *Client) GetServiceDetails(serviceName string) {
 		result = (*c).lookupServiceByName(serviceName)
 
 		if result.ID != "" {
-
-			//println("Getting " + serviceName + " service details")
 
 			//GET /service/search?name={serviceName}
 			req, err := http.NewRequest("GET", FastlyAPIEndPoint+"/service/"+result.ID+"/details", nil)
@@ -41,9 +44,9 @@ func (c *Client) GetServiceDetails(serviceName string) {
 				panic(err)
 			}
 			defer response.Body.Close()
-			body, err := ioutil.ReadAll(response.Body)
+			body, _ := ioutil.ReadAll(response.Body)
 
-			if response.Status == "200 OK" {
+			if response.StatusCode == http.StatusOK {
 
 				var service ServiceModel
 				err := json.Unmarshal(body, &service)
@@ -64,6 +67,7 @@ func (c *Client) GetServiceDetails(serviceName string) {
 	}
 }
 
+//GetServiceDomains Service public cnames
 func (c *Client) GetServiceDomains(serviceName string) {
 
 	if (*c).checkAPIKey() {
@@ -86,9 +90,9 @@ func (c *Client) GetServiceDomains(serviceName string) {
 				panic(err)
 			}
 			defer response.Body.Close()
-			body, err := ioutil.ReadAll(response.Body)
+			body, _ := ioutil.ReadAll(response.Body)
 
-			if response.Status == "200 OK" {
+			if response.StatusCode == http.StatusOK {
 
 				var service ServiceModel
 				err := json.Unmarshal(body, &service)
@@ -96,19 +100,12 @@ func (c *Client) GetServiceDomains(serviceName string) {
 				if err != nil {
 					panic(err)
 				}
-
-				result2, err := json.MarshalIndent(service.ActiveVersion.Domains, "", "\t")
-				if err != nil {
-					panic(err)
-				}
-
-				println(string(result2))
-
 			}
 		}
 	}
 }
 
+//GetServiceBackends Get all the Service backends
 func (c *Client) GetServiceBackends(serviceName string) {
 
 	if (*c).checkAPIKey() {
@@ -131,29 +128,25 @@ func (c *Client) GetServiceBackends(serviceName string) {
 				panic(err)
 			}
 			defer response.Body.Close()
-			body, err := ioutil.ReadAll(response.Body)
 
-			if response.Status == "200 OK" {
+			body, err := ioutil.ReadAll(response.Body)
+			if err != nil {
+				panic(err)
+			}
+
+			if response.StatusCode == http.StatusOK {
 
 				var service ServiceModel
 				err := json.Unmarshal(body, &service)
-
 				if err != nil {
 					panic(err)
 				}
-
-				result2, err := json.MarshalIndent(service.ActiveVersion, "", "\t")
-				if err != nil {
-					panic(err)
-				}
-
-				println(string(result2))
-
 			}
 		}
 	}
 }
 
+//PurgeObjects purge object
 func (c *Client) PurgeObjects(serviceName string, objects string) {
 
 	if (*c).checkAPIKey() && objects != "" {
@@ -178,15 +171,13 @@ func (c *Client) PurgeObjects(serviceName string, objects string) {
 					}
 					defer response.Body.Close()
 
-					if response.Status == "200 OK" {
+					if response.StatusCode == http.StatusOK {
 						println("Service " + serviceName + " successfully purged")
 					} else {
 						println("Service " + serviceName + " failed to purge cached objects")
 					}
 
 				} else {
-
-					//service.Domains[0].Name
 
 					//POST /service/ekjhsdfkjhsdfouejk/purge??
 					req, err := http.NewRequest("PURGE", service.ID+"/"+objects, nil)
@@ -218,10 +209,10 @@ func (c *Client) checkAPIKey() bool {
 	if os.Getenv("FASTLYAPIKEY") == "" {
 		println("Fastly API key not set. Please export $FASTLYAPIKEY=x")
 		return false
-	} else {
-		FastlyAPIKey = os.Getenv("FASTLYAPIKEY")
-		return true
 	}
+
+	FastlyAPIKey = os.Getenv("FASTLYAPIKEY")
+	return true
 }
 
 func (c *Client) lookupServiceByName(serviceName string) SearchResultModel {
@@ -244,6 +235,9 @@ func (c *Client) lookupServiceByName(serviceName string) SearchResultModel {
 		}
 		defer response.Body.Close()
 		body, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			panic(err)
+		}
 
 		if response.Status == "200 OK" {
 
