@@ -11,7 +11,7 @@ func Excute() {
 	app := cli.NewApp()
 	app.Name = "fastlycli"
 	app.Usage = "Manage Fastly CDN Services via the cli"
-	app.Version = "0.8.0"
+	app.Version = "0.9.0"
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{
 			Name:  "verbose",

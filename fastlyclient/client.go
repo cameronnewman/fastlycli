@@ -142,7 +142,7 @@ func (c *Client) GetServiceBackends(serviceName string) {
 					panic(err)
 				}
 
-				result2, err := json.MarshalIndent(service.ActiveVersion.Backends, "", "\t")
+				result2, err := json.MarshalIndent(service.ActiveVersion, "", "\t")
 				if err != nil {
 					panic(err)
 				}
@@ -156,31 +156,60 @@ func (c *Client) GetServiceBackends(serviceName string) {
 
 func (c *Client) PurgeObjects(serviceName string, objects string) {
 
-	if (*c).checkAPIKey() {
+	if (*c).checkAPIKey() && objects != "" {
 
-		var service SearchResultModel
-		service = (*c).lookupServiceByName(serviceName)
+		if objects != "" {
+			var service SearchResultModel
+			service = (*c).lookupServiceByName(serviceName)
 
-		if service.ID != "" {
-			//println("Purging " + serviceName + " service")
+			if service.ID != "" {
+				//println("Purging " + serviceName + " service")
 
-			//POST /service/ekjhsdfkjhsdfouejk/purge_all
-			req, err := http.NewRequest("POST", FastlyAPIEndPoint+"/service/"+service.ID+"/purge_all", nil)
-			req.Header.Set("Content-Type", "application/json")
-			req.Header.Set("Fastly-Key", FastlyAPIKey)
+				if objects == "*" {
+					//POST /service/ekjhsdfkjhsdfouejk/purge_all
+					req, err := http.NewRequest("POST", FastlyAPIEndPoint+"/service/"+service.ID+"/purge_all", nil)
+					req.Header.Set("Content-Type", "application/json")
+					req.Header.Set("Fastly-Key", FastlyAPIKey)
 
-			client := &http.Client{}
-			response, err := client.Do(req)
-			if err != nil {
-				panic(err)
+					client := &http.Client{}
+					response, err := client.Do(req)
+					if err != nil {
+						panic(err)
+					}
+					defer response.Body.Close()
+
+					if response.Status == "200 OK" {
+						println("Service " + serviceName + " successfully purged")
+					} else {
+						println("Service " + serviceName + " failed to purge cached objects")
+					}
+
+				} else {
+
+					//service.Domains[0].Name
+
+					//POST /service/ekjhsdfkjhsdfouejk/purge??
+					req, err := http.NewRequest("PURGE", service.ID+"/"+objects, nil)
+					req.Header.Set("Content-Type", "application/json")
+					req.Header.Set("Fastly-Key", FastlyAPIKey)
+
+					client := &http.Client{}
+					response, err := client.Do(req)
+					if err != nil {
+						panic(err)
+					}
+					defer response.Body.Close()
+
+					if response.Status == "200 OK" {
+						println("Service " + serviceName + " successfully purged")
+					} else {
+						println("Service " + serviceName + " failed to purge cached objects")
+					}
+				}
 			}
-			defer response.Body.Close()
 
-			if response.Status == "200 OK" {
-				println("Service " + serviceName + " successfully purged")
-			} else {
-				println("Service " + serviceName + " failed to purge cached objects")
-			}
+		} else {
+			println("No object or wildcard set")
 		}
 	}
 }
