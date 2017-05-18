@@ -1,5 +1,5 @@
 /*
-Package fastlyclient a simple CLI tool to interact with the Fastly CDN
+Package fastlyclient is simple package tool to interact with the Fastly CDN API
 
 */
 package fastlyclient
