@@ -26,7 +26,7 @@ func NewFastlyClient() *Client {
 //GetServiceDetails Get Fastly service by friendly name
 func (c *Client) GetServiceDetails(serviceName string) {
 
-	if (*c).checkAPIKey() {
+	if c.checkAPIKey() {
 
 		var result SearchResultModel
 		result = (*c).lookupServiceByName(serviceName)
@@ -70,7 +70,7 @@ func (c *Client) GetServiceDetails(serviceName string) {
 //GetServiceDomains Service public cnames
 func (c *Client) GetServiceDomains(serviceName string) {
 
-	if (*c).checkAPIKey() {
+	if c.checkAPIKey() {
 
 		var result SearchResultModel
 		result = (*c).lookupServiceByName(serviceName)
@@ -108,7 +108,7 @@ func (c *Client) GetServiceDomains(serviceName string) {
 //GetServiceBackends Get all the Service backends
 func (c *Client) GetServiceBackends(serviceName string) {
 
-	if (*c).checkAPIKey() {
+	if c.checkAPIKey() {
 
 		var result SearchResultModel
 		result = (*c).lookupServiceByName(serviceName)
@@ -149,7 +149,7 @@ func (c *Client) GetServiceBackends(serviceName string) {
 //PurgeObjects purge object
 func (c *Client) PurgeObjects(serviceName string, objects string) {
 
-	if (*c).checkAPIKey() && objects != "" {
+	if c.checkAPIKey() && objects != "" {
 
 		if objects != "" {
 			var service SearchResultModel
@@ -180,7 +180,7 @@ func (c *Client) PurgeObjects(serviceName string, objects string) {
 				} else {
 
 					//POST /service/ekjhsdfkjhsdfouejk/purge??
-					req, err := http.NewRequest("PURGE", service.ID+"/"+objects, nil)
+					req, err := http.NewRequest("PURGE", FastlyAPIEndPoint+"/service/"+service.ID+"/"+objects, nil)
 					req.Header.Set("Content-Type", "application/json")
 					req.Header.Set("Fastly-Key", FastlyAPIKey)
 
@@ -219,9 +219,7 @@ func (c *Client) lookupServiceByName(serviceName string) SearchResultModel {
 
 	var service SearchResultModel
 
-	if (*c).checkAPIKey() {
-
-		//println("Searching for " + serviceName)
+	if c.checkAPIKey() {
 
 		//GET /service/search?name={serviceName}
 		req, err := http.NewRequest("GET", FastlyAPIEndPoint+"/service/search?name="+serviceName, nil)

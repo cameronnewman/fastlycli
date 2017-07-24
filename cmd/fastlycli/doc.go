@@ -22,7 +22,7 @@ lappy:~ root$ ./fastlycli service domains -service test.com
 ]
 ```
 ```
-lappy:~ root$ ./fastlycli purge -service test.com *
+lappy:~ root$ ./fastlycli purge -service test.com -o *
 Service test.com successfully purged
 ```
 

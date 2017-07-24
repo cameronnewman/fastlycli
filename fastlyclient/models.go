@@ -7,19 +7,36 @@ type SearchResultModel struct {
 	ID         string `json:"id"`
 	Name       string `json:"name"`
 	Versions   []struct {
-		Active           interface{} `json:"active"`
-		Comment          string      `json:"comment"`
-		CreatedAt        string      `json:"created_at"`
-		DeletedAt        interface{} `json:"deleted_at"`
-		Deployed         interface{} `json:"deployed"`
-		InheritServiceID interface{} `json:"inherit_service_id"`
-		Locked           string      `json:"locked"`
-		Number           string      `json:"number"`
-		Service          string      `json:"service"`
-		ServiceID        string      `json:"service_id"`
-		Staging          interface{} `json:"staging"`
-		Testing          interface{} `json:"testing"`
-		UpdatedAt        string      `json:"updated_at"`
+		Active          bool          `json:"active"`
+		Backend         []interface{} `json:"backend"`
+		CacheSettings   []interface{} `json:"cache_settings"`
+		Comment         string        `json:"comment"`
+		Condition       []interface{} `json:"condition"`
+		Created         string        `json:"created"`
+		Deleted         string        `json:"deleted"`
+		Deployed        bool          `json:"deployed"`
+		Director        []interface{} `json:"director"`
+		Domain          []interface{} `json:"domain"`
+		Gzip            []interface{} `json:"gzip"`
+		Header          []interface{} `json:"header"`
+		Healthcheck     []interface{} `json:"healthcheck"`
+		Locked          bool          `json:"locked"`
+		LoggingSyslog   []interface{} `json:"logging_syslog"`
+		Number          int           `json:"number"`
+		RequestSettings []interface{} `json:"request_settings"`
+		ResponseObject  []interface{} `json:"response_object"`
+		ServiceID       string        `json:"service_id"`
+		Settings        struct {
+			GeneralDefaultHost string `json:"general.default_host"`
+			GeneralDefaultPci  int    `json:"general.default_pci"`
+			GeneralDefaultTTL  int    `json:"general.default_ttl"`
+		} `json:"settings"`
+		Staging   bool          `json:"staging"`
+		Testing   bool          `json:"testing"`
+		Updated   string        `json:"updated"`
+		Vcl       []interface{} `json:"vcl"`
+		Waf       []interface{} `json:"waf"`
+		Wordpress []interface{} `json:"wordpress"`
 	} `json:"versions"`
 }
 
@@ -111,7 +128,7 @@ type ServiceModel struct {
 	ID         string `json:"id"`
 	Name       string `json:"name"`
 	Version    struct {
-		Active   interface{} `json:"active"`
+		Active   bool `json:"active"`
 		Backends []struct {
 			Address             string      `json:"address"`
 			AutoLoadbalance     bool        `json:"auto_loadbalance"`
@@ -186,7 +203,7 @@ type ServiceModel struct {
 		Wordpress []interface{} `json:"wordpress"`
 	} `json:"version"`
 	Versions []struct {
-		Active           interface{} `json:"active"`
+		Active           bool        `json:"active"`
 		Comment          string      `json:"comment"`
 		CreatedAt        string      `json:"created_at"`
 		DeletedAt        interface{} `json:"deleted_at"`
