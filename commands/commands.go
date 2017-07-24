@@ -98,6 +98,24 @@ func Excute() {
 				}
 			},
 		},
+		{
+			Name:  "purgeall",
+			Usage: "Purge all objects from the CDN",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "service, s",
+					Usage: "Service Name defined in app.fastly.com",
+				},
+			},
+			Action: func(c *cli.Context) {
+				if c.IsSet("service") && c.String("service") != "" {
+					fastly := fastlyclient.NewFastlyClient()
+					fastly.PurgeObjects(c.String("service"), "*")
+				} else {
+					println("No service name defined")
+				}
+			},
+		},
 	}
 
 	app.Run(os.Args)

@@ -25,7 +25,12 @@ lappy:~ root$ ./fastlycli service domains -service test.com
 ]
 ```
 ```
-lappy:~ root$ ./fastlycli purge -service test.com *
+lappy:~ root$ ./fastlycli purge -service example.com -o http://www.example.com/js/main.js
+Service test.com successfully purged
+```
+
+```
+lappy:~ root$ ./fastlycli purgeall -service example.com
 Service test.com successfully purged
 ```
 

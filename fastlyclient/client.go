@@ -8,7 +8,10 @@ import (
 )
 
 //FastlyAPIEndPoint Default API hostname
-const FastlyAPIEndPoint = "https://api.fastly.com"
+const (
+	FastlyAPIEndPoint = "https://api.fastly.com"
+	FastlyPurgeAll    = "*"
+)
 
 //Client struct for client connection
 type Client struct {
@@ -73,7 +76,7 @@ func (c *Client) GetServiceDomains(serviceName string) {
 	if c.checkAPIKey() {
 
 		var result SearchResultModel
-		result = (*c).lookupServiceByName(serviceName)
+		result = c.lookupServiceByName(serviceName)
 
 		if result.ID != "" {
 
@@ -111,7 +114,7 @@ func (c *Client) GetServiceBackends(serviceName string) {
 	if c.checkAPIKey() {
 
 		var result SearchResultModel
-		result = (*c).lookupServiceByName(serviceName)
+		result = c.lookupServiceByName(serviceName)
 
 		if result.ID != "" {
 
@@ -153,12 +156,11 @@ func (c *Client) PurgeObjects(serviceName string, objects string) {
 
 		if objects != "" {
 			var service SearchResultModel
-			service = (*c).lookupServiceByName(serviceName)
+			service = c.lookupServiceByName(serviceName)
 
 			if service.ID != "" {
-				//println("Purging " + serviceName + " service")
 
-				if objects == "*" {
+				if objects == FastlyPurgeAll {
 					//POST /service/ekjhsdfkjhsdfouejk/purge_all
 					req, err := http.NewRequest("POST", FastlyAPIEndPoint+"/service/"+service.ID+"/purge_all", nil)
 					req.Header.Set("Content-Type", "application/json")
