@@ -5,16 +5,21 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"time"
 )
 
 //FastlyAPIEndPoint Default API hostname
 const (
-	FastlyAPIEndPoint = "https://api.fastly.com"
-	FastlyPurgeAll    = "*"
+	httpMaxIdleConnections   int    = 30
+	httpRequestTimeout       int    = 60
+	FastlyAPIEndPoint        string = "https://api.fastly.com"
+	FastlyPurgeAll           string = "*"
+	FastlyAPIEnvironmentName string = "FASTLYAPIKEY"
 )
 
 //Client struct for client connection
 type Client struct {
+	httpClient *http.Client
 }
 
 //FastlyAPIKey api key
@@ -22,8 +27,9 @@ var FastlyAPIKey string
 
 //NewFastlyClient constructor
 func NewFastlyClient() *Client {
-	fastlyClient := &Client{}
-	return fastlyClient
+	client := &Client{}
+	client.httpClient = client.initHTTPClient()
+	return client
 }
 
 //GetServiceDetails Get Fastly service by friendly name
@@ -38,11 +44,10 @@ func (c *Client) GetServiceDetails(serviceName string) {
 
 			//GET /service/search?name={serviceName}
 			req, err := http.NewRequest("GET", FastlyAPIEndPoint+"/service/"+result.ID+"/details", nil)
-			req.Header.Set("Content-Type", "application/json")
-			req.Header.Set("Fastly-Key", FastlyAPIKey)
+			req.Header.Set(HeaderContentType, MIMEApplicationJSON)
+			req.Header.Set(HeaderFastlyKey, FastlyAPIKey)
 
-			client := &http.Client{}
-			response, err := client.Do(req)
+			response, err := c.httpClient.Do(req)
 			if err != nil {
 				panic(err)
 			}
@@ -58,13 +63,12 @@ func (c *Client) GetServiceDetails(serviceName string) {
 					panic(err)
 				}
 
-				result2, err := json.MarshalIndent(service, "", "\t")
+				result, err := json.MarshalIndent(service, "", "\t")
 				if err != nil {
 					panic(err)
 				}
 
-				println(string(result2))
-
+				println(string(result))
 			}
 		}
 	}
@@ -80,15 +84,12 @@ func (c *Client) GetServiceDomains(serviceName string) {
 
 		if result.ID != "" {
 
-			//println("Getting " + serviceName + " service domains")
-
 			//GET /service/search?name={serviceName}
-			req, err := http.NewRequest("GET", FastlyAPIEndPoint+"/service/"+result.ID+"/details", nil)
-			req.Header.Set("Content-Type", "application/json")
-			req.Header.Set("Fastly-Key", FastlyAPIKey)
+			req, err := http.NewRequest(http.MethodGet, FastlyAPIEndPoint+"/service/"+result.ID+"/details", nil)
+			req.Header.Set(HeaderContentType, MIMEApplicationJSON)
+			req.Header.Set(HeaderFastlyKey, FastlyAPIKey)
 
-			client := &http.Client{}
-			response, err := client.Do(req)
+			response, err := c.httpClient.Do(req)
 			if err != nil {
 				panic(err)
 			}
@@ -99,7 +100,6 @@ func (c *Client) GetServiceDomains(serviceName string) {
 
 				var service ServiceModel
 				err := json.Unmarshal(body, &service)
-
 				if err != nil {
 					panic(err)
 				}
@@ -112,21 +112,16 @@ func (c *Client) GetServiceDomains(serviceName string) {
 func (c *Client) GetServiceBackends(serviceName string) {
 
 	if c.checkAPIKey() {
-
 		var result SearchResultModel
 		result = c.lookupServiceByName(serviceName)
 
 		if result.ID != "" {
-
-			//println("Getting " + serviceName + " service domains")
-
 			//GET /service/search?name={serviceName}
-			req, err := http.NewRequest("GET", FastlyAPIEndPoint+"/service/"+result.ID+"/details", nil)
-			req.Header.Set("Content-Type", "application/json")
-			req.Header.Set("Fastly-Key", FastlyAPIKey)
+			req, err := http.NewRequest(http.MethodGet, FastlyAPIEndPoint+"/service/"+result.ID+"/details", nil)
+			req.Header.Set(HeaderContentType, MIMEApplicationJSON)
+			req.Header.Set(HeaderFastlyKey, FastlyAPIKey)
 
-			client := &http.Client{}
-			response, err := client.Do(req)
+			response, err := c.httpClient.Do(req)
 			if err != nil {
 				panic(err)
 			}
@@ -138,7 +133,6 @@ func (c *Client) GetServiceBackends(serviceName string) {
 			}
 
 			if response.StatusCode == http.StatusOK {
-
 				var service ServiceModel
 				err := json.Unmarshal(body, &service)
 				if err != nil {
@@ -162,12 +156,11 @@ func (c *Client) PurgeObjects(serviceName string, objects string) {
 
 				if objects == FastlyPurgeAll {
 					//POST /service/ekjhsdfkjhsdfouejk/purge_all
-					req, err := http.NewRequest("POST", FastlyAPIEndPoint+"/service/"+service.ID+"/purge_all", nil)
-					req.Header.Set("Content-Type", "application/json")
-					req.Header.Set("Fastly-Key", FastlyAPIKey)
+					req, err := http.NewRequest(http.MethodPost, FastlyAPIEndPoint+"/service/"+service.ID+"/purge_all", nil)
+					req.Header.Set(HeaderContentType, MIMEApplicationJSON)
+					req.Header.Set(HeaderFastlyKey, FastlyAPIKey)
 
-					client := &http.Client{}
-					response, err := client.Do(req)
+					response, err := c.httpClient.Do(req)
 					if err != nil {
 						panic(err)
 					}
@@ -182,9 +175,9 @@ func (c *Client) PurgeObjects(serviceName string, objects string) {
 				} else {
 
 					//POST /service/ekjhsdfkjhsdfouejk/purge??
-					req, err := http.NewRequest("PURGE", FastlyAPIEndPoint+"/service/"+service.ID+"/"+objects, nil)
-					req.Header.Set("Content-Type", "application/json")
-					req.Header.Set("Fastly-Key", FastlyAPIKey)
+					req, err := http.NewRequest(HTTPMethodPurge, FastlyAPIEndPoint+"/service/"+service.ID+"/"+objects, nil)
+					req.Header.Set(HeaderContentType, MIMEApplicationJSON)
+					req.Header.Set(HeaderFastlyKey, FastlyAPIKey)
 
 					client := &http.Client{}
 					response, err := client.Do(req)
@@ -193,7 +186,7 @@ func (c *Client) PurgeObjects(serviceName string, objects string) {
 					}
 					defer response.Body.Close()
 
-					if response.Status == "200 OK" {
+					if response.StatusCode == http.StatusOK {
 						println("Service " + serviceName + " successfully purged")
 					} else {
 						println("Service " + serviceName + " failed to purge cached objects")
@@ -208,12 +201,12 @@ func (c *Client) PurgeObjects(serviceName string, objects string) {
 }
 
 func (c *Client) checkAPIKey() bool {
-	if os.Getenv("FASTLYAPIKEY") == "" {
+	if os.Getenv(FastlyAPIEnvironmentName) == "" {
 		println("Fastly API key not set. Please export $FASTLYAPIKEY=x")
 		return false
 	}
 
-	FastlyAPIKey = os.Getenv("FASTLYAPIKEY")
+	FastlyAPIKey = os.Getenv(FastlyAPIEnvironmentName)
 	return true
 }
 
@@ -224,12 +217,11 @@ func (c *Client) lookupServiceByName(serviceName string) SearchResultModel {
 	if c.checkAPIKey() {
 
 		//GET /service/search?name={serviceName}
-		req, err := http.NewRequest("GET", FastlyAPIEndPoint+"/service/search?name="+serviceName, nil)
-		req.Header.Set("Content-Type", "application/json")
-		req.Header.Set("Fastly-Key", FastlyAPIKey)
+		req, err := http.NewRequest(http.MethodGet, FastlyAPIEndPoint+"/service/search?name="+serviceName, nil)
+		req.Header.Set(HeaderContentType, MIMEApplicationJSON)
+		req.Header.Set(HeaderFastlyKey, FastlyAPIKey)
 
-		client := &http.Client{}
-		response, err := client.Do(req)
+		response, err := c.httpClient.Do(req)
 		if err != nil {
 			panic(err)
 		}
@@ -239,11 +231,8 @@ func (c *Client) lookupServiceByName(serviceName string) SearchResultModel {
 			panic(err)
 		}
 
-		if response.Status == "200 OK" {
-
+		if response.StatusCode == http.StatusOK {
 			err := json.Unmarshal(body, &service)
-			//println("Service " + serviceName + " found. ID=" + service.ID)
-
 			if err != nil {
 				panic(err)
 			}
@@ -252,4 +241,16 @@ func (c *Client) lookupServiceByName(serviceName string) SearchResultModel {
 		}
 	}
 	return service
+}
+
+func (*Client) initHTTPClient() *http.Client {
+	return &http.Client{
+		Transport: &http.Transport{
+			MaxIdleConnsPerHost: httpMaxIdleConnections,
+		},
+		Timeout: time.Duration(httpRequestTimeout) * time.Second,
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
 }
