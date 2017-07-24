@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/cameronnewman/fastlycli/fastlyclient"
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 )
 
 //Excute main section

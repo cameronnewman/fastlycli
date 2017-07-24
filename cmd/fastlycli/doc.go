@@ -21,8 +21,14 @@ lappy:~ root$ ./fastlycli service domains -service test.com
 	}
 ]
 ```
+
 ```
-lappy:~ root$ ./fastlycli purge -service test.com -o *
+lappy:~ root$ ./fastlycli purge -service test.com -o http://test.com/js/main.js
+Service test.com successfully purged
+```
+
+```
+lappy:~ root$ ./fastlycli purgeall -service test.com
 Service test.com successfully purged
 ```
 
@@ -35,11 +41,12 @@ USAGE:
    fastlycli [global options] command [command options] [arguments...]
 
 VERSION:
-   0.8.0
+   0.9.0
 
 COMMANDS:
    service	Get Service Details
    purge	Purge objects from the CDN
+   purgeall	Purge all objects from the CDN
    help, h	Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
