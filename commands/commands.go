@@ -110,7 +110,7 @@ func Excute() {
 			Action: func(c *cli.Context) {
 				if c.IsSet("service") && c.String("service") != "" {
 					fastly := fastlyclient.NewFastlyClient()
-					fastly.PurgeObjects(c.String("service"), "*")
+					fastly.PurgeAllObjects(c.String("service"))
 				} else {
 					println("No service name defined")
 				}

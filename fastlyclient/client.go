@@ -13,21 +13,26 @@ const (
 	httpMaxIdleConnections   int    = 30
 	httpRequestTimeout       int    = 60
 	FastlyAPIEndPoint        string = "https://api.fastly.com"
-	FastlyPurgeAll           string = "*"
 	FastlyAPIEnvironmentName string = "FASTLYAPIKEY"
 )
 
 //Client struct for client connection
 type Client struct {
 	httpClient *http.Client
+	apiKey     string
 }
-
-//FastlyAPIKey api key
-var FastlyAPIKey string
 
 //NewFastlyClient constructor
 func NewFastlyClient() *Client {
 	client := &Client{}
+
+	key, err := client.getAPIKey()
+	if err != nil {
+		println(err.Error())
+		os.Exit(1)
+	}
+
+	client.apiKey = key
 	client.httpClient = client.initHTTPClient()
 	return client
 }
@@ -35,110 +40,106 @@ func NewFastlyClient() *Client {
 //GetServiceDetails Get Fastly service by friendly name
 func (c *Client) GetServiceDetails(serviceName string) {
 
-	if c.checkAPIKey() {
-
-		var result SearchResultModel
-		result = (*c).lookupServiceByName(serviceName)
-
-		if result.ID != "" {
-
-			//GET /service/search?name={serviceName}
-			req, err := http.NewRequest("GET", FastlyAPIEndPoint+"/service/"+result.ID+"/details", nil)
-			req.Header.Set(HeaderContentType, MIMEApplicationJSON)
-			req.Header.Set(HeaderFastlyKey, FastlyAPIKey)
-
-			response, err := c.httpClient.Do(req)
-			if err != nil {
-				panic(err)
-			}
-			defer response.Body.Close()
-			body, _ := ioutil.ReadAll(response.Body)
-
-			if response.StatusCode == http.StatusOK {
-
-				var service ServiceModel
-				err := json.Unmarshal(body, &service)
-
-				if err != nil {
-					panic(err)
-				}
-
-				result, err := json.MarshalIndent(service, "", "\t")
-				if err != nil {
-					panic(err)
-				}
-
-				println(string(result))
-			}
-		}
+	var result SearchResultModel
+	result, err := c.lookupServiceByName(serviceName)
+	if err != nil {
+		println(err.Error())
+		os.Exit(1)
 	}
+
+	//GET /service/search?name={serviceName}
+	req, err := http.NewRequest("GET", FastlyAPIEndPoint+"/service/"+result.ID+"/details", nil)
+	req.Header.Set(HeaderContentType, MIMEApplicationJSON)
+	req.Header.Set(HeaderFastlyKey, c.apiKey)
+
+	response, err := c.httpClient.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer response.Body.Close()
+	body, _ := ioutil.ReadAll(response.Body)
+
+	if response.StatusCode == http.StatusOK {
+		var service ServiceModel
+		err := json.Unmarshal(body, &service)
+		if err != nil {
+			panic(err)
+		}
+
+		result, err := json.MarshalIndent(service, "", "\t")
+		if err != nil {
+			panic(err)
+		}
+
+		println(string(result))
+	}
+
 }
 
 //GetServiceDomains Service public cnames
 func (c *Client) GetServiceDomains(serviceName string) {
 
-	if c.checkAPIKey() {
+	var result SearchResultModel
+	result, err := c.lookupServiceByName(serviceName)
+	if err != nil {
+		println(err.Error())
+		os.Exit(1)
+	}
 
-		var result SearchResultModel
-		result = c.lookupServiceByName(serviceName)
+	//GET /service/search?name={serviceName}
+	req, err := http.NewRequest(http.MethodGet, FastlyAPIEndPoint+"/service/"+result.ID+"/details", nil)
+	req.Header.Set(HeaderContentType, MIMEApplicationJSON)
+	req.Header.Set(HeaderFastlyKey, c.apiKey)
 
-		if result.ID != "" {
+	response, err := c.httpClient.Do(req)
+	if err != nil {
+		println(err.Error())
+	}
+	defer response.Body.Close()
+	body, _ := ioutil.ReadAll(response.Body)
 
-			//GET /service/search?name={serviceName}
-			req, err := http.NewRequest(http.MethodGet, FastlyAPIEndPoint+"/service/"+result.ID+"/details", nil)
-			req.Header.Set(HeaderContentType, MIMEApplicationJSON)
-			req.Header.Set(HeaderFastlyKey, FastlyAPIKey)
+	if response.StatusCode == http.StatusOK {
 
-			response, err := c.httpClient.Do(req)
-			if err != nil {
-				panic(err)
-			}
-			defer response.Body.Close()
-			body, _ := ioutil.ReadAll(response.Body)
-
-			if response.StatusCode == http.StatusOK {
-
-				var service ServiceModel
-				err := json.Unmarshal(body, &service)
-				if err != nil {
-					panic(err)
-				}
-			}
+		var service ServiceModel
+		err := json.Unmarshal(body, &service)
+		if err != nil {
+			println(err.Error())
 		}
 	}
+
 }
 
 //GetServiceBackends Get all the Service backends
 func (c *Client) GetServiceBackends(serviceName string) {
 
-	if c.checkAPIKey() {
-		var result SearchResultModel
-		result = c.lookupServiceByName(serviceName)
+	var result SearchResultModel
+	result, err := c.lookupServiceByName(serviceName)
+	if err != nil {
+		println(err.Error())
+		os.Exit(1)
+	}
 
-		if result.ID != "" {
-			//GET /service/search?name={serviceName}
-			req, err := http.NewRequest(http.MethodGet, FastlyAPIEndPoint+"/service/"+result.ID+"/details", nil)
-			req.Header.Set(HeaderContentType, MIMEApplicationJSON)
-			req.Header.Set(HeaderFastlyKey, FastlyAPIKey)
+	//GET /service/search?name={serviceName}
+	req, err := http.NewRequest(http.MethodGet, FastlyAPIEndPoint+"/service/"+result.ID+"/details", nil)
+	req.Header.Set(HeaderContentType, MIMEApplicationJSON)
+	req.Header.Set(HeaderFastlyKey, c.apiKey)
 
-			response, err := c.httpClient.Do(req)
-			if err != nil {
-				panic(err)
-			}
-			defer response.Body.Close()
+	response, err := c.httpClient.Do(req)
+	if err != nil {
+		println(err.Error())
+	}
+	defer response.Body.Close()
 
-			body, err := ioutil.ReadAll(response.Body)
-			if err != nil {
-				panic(err)
-			}
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		println(err.Error())
+	}
 
-			if response.StatusCode == http.StatusOK {
-				var service ServiceModel
-				err := json.Unmarshal(body, &service)
-				if err != nil {
-					panic(err)
-				}
-			}
+	if response.StatusCode == http.StatusOK {
+		var service ServiceModel
+		err := json.Unmarshal(body, &service)
+		if err != nil {
+			println(err.Error())
 		}
 	}
 }
@@ -146,101 +147,110 @@ func (c *Client) GetServiceBackends(serviceName string) {
 //PurgeObjects purge object
 func (c *Client) PurgeObjects(serviceName string, objects string) {
 
-	if c.checkAPIKey() && objects != "" {
+	var result SearchResultModel
+	result, err := c.lookupServiceByName(serviceName)
+	if err != nil {
+		println(err.Error())
+		os.Exit(1)
+	}
 
-		if objects != "" {
-			var service SearchResultModel
-			service = c.lookupServiceByName(serviceName)
+	if !c.checkStringIsNotEmpty(objects) {
+		println("No object or wildcard set")
+		//println(err.Error())
+		os.Exit(1)
+	}
 
-			if service.ID != "" {
+	//POST /service/ekjhsdfkjhsdfouejk/purge??
+	req, err := http.NewRequest(HTTPMethodPurge, FastlyAPIEndPoint+"/service/"+result.ID+"/"+objects, nil)
+	req.Header.Set(HeaderContentType, MIMEApplicationJSON)
+	req.Header.Set(HeaderFastlyKey, c.apiKey)
 
-				if objects == FastlyPurgeAll {
-					//POST /service/ekjhsdfkjhsdfouejk/purge_all
-					req, err := http.NewRequest(http.MethodPost, FastlyAPIEndPoint+"/service/"+service.ID+"/purge_all", nil)
-					req.Header.Set(HeaderContentType, MIMEApplicationJSON)
-					req.Header.Set(HeaderFastlyKey, FastlyAPIKey)
+	client := &http.Client{}
+	response, err := client.Do(req)
+	if err != nil {
+		println(err.Error())
+	}
+	defer response.Body.Close()
 
-					response, err := c.httpClient.Do(req)
-					if err != nil {
-						panic(err)
-					}
-					defer response.Body.Close()
-
-					if response.StatusCode == http.StatusOK {
-						println("Service " + serviceName + " successfully purged")
-					} else {
-						println("Service " + serviceName + " failed to purge cached objects")
-					}
-
-				} else {
-
-					//POST /service/ekjhsdfkjhsdfouejk/purge??
-					req, err := http.NewRequest(HTTPMethodPurge, FastlyAPIEndPoint+"/service/"+service.ID+"/"+objects, nil)
-					req.Header.Set(HeaderContentType, MIMEApplicationJSON)
-					req.Header.Set(HeaderFastlyKey, FastlyAPIKey)
-
-					client := &http.Client{}
-					response, err := client.Do(req)
-					if err != nil {
-						panic(err)
-					}
-					defer response.Body.Close()
-
-					if response.StatusCode == http.StatusOK {
-						println("Service " + serviceName + " successfully purged")
-					} else {
-						println("Service " + serviceName + " failed to purge cached objects")
-					}
-				}
-			}
-
-		} else {
-			println("No object or wildcard set")
-		}
+	if response.StatusCode == http.StatusOK {
+		println("Service " + serviceName + " successfully purged")
+	} else {
+		println("Service " + serviceName + " failed to purge cached objects")
 	}
 }
 
-func (c *Client) checkAPIKey() bool {
-	if os.Getenv(FastlyAPIEnvironmentName) == "" {
-		println("Fastly API key not set. Please export $FASTLYAPIKEY=x")
-		return false
+//PurgeAllObjects purge object
+func (c *Client) PurgeAllObjects(serviceName string) {
+
+	var result SearchResultModel
+	result, err := c.lookupServiceByName(serviceName)
+	if err != nil {
+		println(err.Error())
+		os.Exit(1)
 	}
 
-	FastlyAPIKey = os.Getenv(FastlyAPIEnvironmentName)
-	return true
+	//POST /service/ekjhsdfkjhsdfouejk/purge_all
+	req, err := http.NewRequest(http.MethodPost, FastlyAPIEndPoint+"/service/"+result.ID+"/purge_all", nil)
+	req.Header.Set(HeaderContentType, MIMEApplicationJSON)
+	req.Header.Set(HeaderFastlyKey, c.apiKey)
+
+	response, err := c.httpClient.Do(req)
+	if err != nil {
+		println(err.Error())
+		os.Exit(1)
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode == http.StatusOK {
+		println("Service " + serviceName + " successfully purged")
+	} else {
+		println("Service " + serviceName + " failed to purge service")
+	}
 }
 
-func (c *Client) lookupServiceByName(serviceName string) SearchResultModel {
+func (c *Client) lookupServiceByName(serviceName string) (SearchResultModel, error) {
 
 	var service SearchResultModel
 
-	if c.checkAPIKey() {
+	//GET /service/search?name={serviceName}
+	req, err := http.NewRequest(http.MethodGet, FastlyAPIEndPoint+"/service/search?name="+serviceName, nil)
+	req.Header.Set(HeaderContentType, MIMEApplicationJSON)
+	req.Header.Set(HeaderFastlyKey, c.apiKey)
 
-		//GET /service/search?name={serviceName}
-		req, err := http.NewRequest(http.MethodGet, FastlyAPIEndPoint+"/service/search?name="+serviceName, nil)
-		req.Header.Set(HeaderContentType, MIMEApplicationJSON)
-		req.Header.Set(HeaderFastlyKey, FastlyAPIKey)
-
-		response, err := c.httpClient.Do(req)
-		if err != nil {
-			panic(err)
-		}
-		defer response.Body.Close()
-		body, err := ioutil.ReadAll(response.Body)
-		if err != nil {
-			panic(err)
-		}
-
-		if response.StatusCode == http.StatusOK {
-			err := json.Unmarshal(body, &service)
-			if err != nil {
-				panic(err)
-			}
-		} else {
-			println("No service called " + serviceName + " exists")
-		}
+	response, err := c.httpClient.Do(req)
+	if err != nil {
+		return service, err
 	}
-	return service
+	defer response.Body.Close()
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return service, err
+	}
+
+	if response.StatusCode == http.StatusOK {
+		err := json.Unmarshal(body, &service)
+		if err != nil {
+			return service, err
+		}
+		return service, nil
+	}
+
+	return service, ErrorNoServiceWithNameExists
+}
+
+func (c *Client) checkStringIsNotEmpty(s string) bool {
+	return !c.isStringEmpty(s)
+}
+
+func (c *Client) isStringEmpty(s string) bool {
+	return len(s) == 0
+}
+
+func (c *Client) getAPIKey() (string, error) {
+	if os.Getenv(FastlyAPIEnvironmentName) == "" {
+		return "", ErrorNoAPIKeySet
+	}
+	return os.Getenv(FastlyAPIEnvironmentName), nil
 }
 
 func (*Client) initHTTPClient() *http.Client {
