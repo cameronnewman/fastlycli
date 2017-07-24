@@ -43,11 +43,12 @@ USAGE:
    fastlycli [global options] command [command options] [arguments...]
 
 VERSION:
-   0.8.0
+   0.9.0
 
 COMMANDS:
    service	Get Service Details
    purge	Purge objects from the CDN
+   purgeall  Purge all objects from the CDN
    help, h	Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
