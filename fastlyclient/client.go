@@ -70,10 +70,10 @@ func (c *Client) GetServiceDetails(serviceName string) {
 		if err != nil {
 			panic(err)
 		}
-
 		println(string(result))
+		return
 	}
-
+	println(ErrorFailedToRetrieveServiceDetails.Error())
 }
 
 //GetServiceDomains Service public cnames
@@ -105,8 +105,15 @@ func (c *Client) GetServiceDomains(serviceName string) {
 		if err != nil {
 			println(err.Error())
 		}
-	}
 
+		result, err := json.MarshalIndent(service.ActiveVersion.Domains, "", "\t")
+		if err != nil {
+			panic(err)
+		}
+		println(string(result))
+		return
+	}
+	println(ErrorFailedToRetrieveServiceDetails.Error())
 }
 
 //GetServiceBackends Get all the Service backends
@@ -141,7 +148,15 @@ func (c *Client) GetServiceBackends(serviceName string) {
 		if err != nil {
 			println(err.Error())
 		}
+
+		result, err := json.MarshalIndent(service.ActiveVersion.Backends, "", "\t")
+		if err != nil {
+			panic(err)
+		}
+		println(string(result))
+		return
 	}
+	println(ErrorFailedToRetrieveServiceDetails.Error())
 }
 
 //PurgeObjects purge object
@@ -154,9 +169,8 @@ func (c *Client) PurgeObjects(serviceName string, objects string) {
 		os.Exit(1)
 	}
 
-	if !c.checkStringIsNotEmpty(objects) {
-		println("No object or wildcard set")
-		//println(err.Error())
+	if c.isStringEmpty(objects) {
+		println(ErrorNoObjectSetForPurge.Error())
 		os.Exit(1)
 	}
 
@@ -173,10 +187,10 @@ func (c *Client) PurgeObjects(serviceName string, objects string) {
 	defer response.Body.Close()
 
 	if response.StatusCode == http.StatusOK {
-		println("Service " + serviceName + " successfully purged")
-	} else {
-		println("Service " + serviceName + " failed to purge cached objects")
+		println(ResponseSucessfullyPurgedObject)
+		return
 	}
+	println(ErrorFailedToPurgeObject.Error())
 }
 
 //PurgeAllObjects purge object
@@ -202,10 +216,10 @@ func (c *Client) PurgeAllObjects(serviceName string) {
 	defer response.Body.Close()
 
 	if response.StatusCode == http.StatusOK {
-		println("Service " + serviceName + " successfully purged")
-	} else {
-		println("Service " + serviceName + " failed to purge service")
+		println(ResponseSucessfullyPurgedAllObjectsFromService)
+		return
 	}
+	println(ErrorFailedToPurgeService.Error())
 }
 
 func (c *Client) lookupServiceByName(serviceName string) (SearchResultModel, error) {
@@ -236,10 +250,6 @@ func (c *Client) lookupServiceByName(serviceName string) (SearchResultModel, err
 	}
 
 	return service, ErrorNoServiceWithNameExists
-}
-
-func (c *Client) checkStringIsNotEmpty(s string) bool {
-	return !c.isStringEmpty(s)
 }
 
 func (c *Client) isStringEmpty(s string) bool {
