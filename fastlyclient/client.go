@@ -9,7 +9,6 @@ import (
 	"time"
 )
 
-//FastlyAPIEndPoint Default API hostname
 const (
 	httpMaxIdleConnections   int    = 30
 	httpRequestTimeout       int    = 60
@@ -17,7 +16,7 @@ const (
 	FastlyAPIEnvironmentName string = "FASTLYAPIKEY"
 )
 
-//Client struct for client connection
+//Client struct for fastly client connection
 type Client struct {
 	httpClient *http.Client
 	apiKey     string
@@ -38,7 +37,7 @@ func NewFastlyClient() *Client {
 	return client
 }
 
-//GetServiceDetails Get Fastly service by friendly name
+//GetServiceDetails get service details via friendly name
 func (c *Client) GetServiceDetails(serviceName string) {
 
 	var result SearchResultModel
@@ -77,7 +76,7 @@ func (c *Client) GetServiceDetails(serviceName string) {
 	println(ErrorFailedToRetrieveServiceDetails.Error())
 }
 
-//GetServiceDomains Service public cnames
+//GetServiceDomains get public cnames for service
 func (c *Client) GetServiceDomains(serviceName string) {
 
 	var result SearchResultModel
@@ -117,7 +116,7 @@ func (c *Client) GetServiceDomains(serviceName string) {
 	println(ErrorFailedToRetrieveServiceDetails.Error())
 }
 
-//GetServiceBackends Get all the Service backends
+//GetServiceBackends get all backends for a service
 func (c *Client) GetServiceBackends(serviceName string) {
 
 	var result SearchResultModel
@@ -160,8 +159,8 @@ func (c *Client) GetServiceBackends(serviceName string) {
 	println(ErrorFailedToRetrieveServiceDetails.Error())
 }
 
-//PurgeObjects purge object
-func (c *Client) PurgeObjects(serviceName string, object string) {
+//PurgeObject an object from the service
+func (c *Client) PurgeObject(serviceName string, object string) {
 
 	var result SearchResultModel
 	result, err := c.lookupServiceByName(serviceName)
@@ -200,7 +199,7 @@ func (c *Client) PurgeObjects(serviceName string, object string) {
 	println(ErrorFailedToPurgeObject.Error())
 }
 
-//PurgeAllObjects purge object
+//PurgeAllObjects for service
 func (c *Client) PurgeAllObjects(serviceName string) {
 
 	var result SearchResultModel
