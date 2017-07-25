@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 	"time"
 )
@@ -160,7 +161,7 @@ func (c *Client) GetServiceBackends(serviceName string) {
 }
 
 //PurgeObjects purge object
-func (c *Client) PurgeObjects(serviceName string, objects string) {
+func (c *Client) PurgeObjects(serviceName string, object string) {
 
 	var result SearchResultModel
 	result, err := c.lookupServiceByName(serviceName)
@@ -169,13 +170,19 @@ func (c *Client) PurgeObjects(serviceName string, objects string) {
 		os.Exit(1)
 	}
 
-	if c.isStringEmpty(objects) {
+	if c.isStringEmpty(object) {
 		println(ErrorNoObjectSetForPurge.Error())
 		os.Exit(1)
 	}
 
+	_, err = url.ParseRequestURI(object)
+	if err != nil {
+		println(ErrorObjectIsNotVaildateURI.Error())
+		os.Exit(1)
+	}
+
 	//POST /service/ekjhsdfkjhsdfouejk/purge??
-	req, err := http.NewRequest(HTTPMethodPurge, FastlyAPIEndPoint+"/service/"+result.ID+"/"+objects, nil)
+	req, err := http.NewRequest(HTTPMethodPurge, FastlyAPIEndPoint+"/service/"+result.ID+"/"+object, nil)
 	req.Header.Set(HeaderContentType, MIMEApplicationJSON)
 	req.Header.Set(HeaderFastlyKey, c.apiKey)
 
