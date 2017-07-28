@@ -1,6 +1,6 @@
 package fastlyclient
 
-//SearchResultModel Search result model
+//SearchResultModel result struct from search by service name
 type SearchResultModel struct {
 	Comment    string `json:"comment"`
 	CustomerID string `json:"customer_id"`
@@ -40,13 +40,13 @@ type SearchResultModel struct {
 	} `json:"versions"`
 }
 
-//PurgeObjectResultModel Result model for purge
+//PurgeObjectResultModel result struct from purging an object
 type PurgeObjectResultModel struct {
 	Status string `json:"status"`
 	ID     string `json:"id"`
 }
 
-//ServiceModel Service Model
+//ServiceModel result struct from a service details lookup
 type ServiceModel struct {
 	ActiveVersion struct {
 		Active   bool `json:"active"`
