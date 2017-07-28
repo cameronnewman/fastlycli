@@ -12,8 +12,8 @@ import (
 const (
 	httpMaxIdleConnections   int    = 30
 	httpRequestTimeout       int    = 60
-	FastlyAPIEndPoint        string = "https://api.fastly.com"
-	FastlyAPIEnvironmentName string = "FASTLYAPIKEY"
+	fastlyAPIEndPoint        string = "https://api.fastly.com"
+	fastlyAPIEnvironmentName string = "FASTLYAPIKEY"
 )
 
 //Client struct for fastly client connection
@@ -48,7 +48,7 @@ func (c *Client) GetServiceDetails(serviceName string) {
 	}
 
 	//GET /service/search?name={serviceName}
-	req, err := http.NewRequest("GET", FastlyAPIEndPoint+"/service/"+result.ID+"/details", nil)
+	req, err := http.NewRequest("GET", fastlyAPIEndPoint+"/service/"+result.ID+"/details", nil)
 	req.Header.Set(HeaderContentType, MIMEApplicationJSON)
 	req.Header.Set(HeaderFastlyKey, c.apiKey)
 
@@ -87,7 +87,7 @@ func (c *Client) GetServiceDomains(serviceName string) {
 	}
 
 	//GET /service/search?name={serviceName}
-	req, err := http.NewRequest(http.MethodGet, FastlyAPIEndPoint+"/service/"+result.ID+"/details", nil)
+	req, err := http.NewRequest(http.MethodGet, fastlyAPIEndPoint+"/service/"+result.ID+"/details", nil)
 	req.Header.Set(HeaderContentType, MIMEApplicationJSON)
 	req.Header.Set(HeaderFastlyKey, c.apiKey)
 
@@ -127,7 +127,7 @@ func (c *Client) GetServiceBackends(serviceName string) {
 	}
 
 	//GET /service/search?name={serviceName}
-	req, err := http.NewRequest(http.MethodGet, FastlyAPIEndPoint+"/service/"+result.ID+"/details", nil)
+	req, err := http.NewRequest(http.MethodGet, fastlyAPIEndPoint+"/service/"+result.ID+"/details", nil)
 	req.Header.Set(HeaderContentType, MIMEApplicationJSON)
 	req.Header.Set(HeaderFastlyKey, c.apiKey)
 
@@ -181,7 +181,7 @@ func (c *Client) PurgeObject(serviceName string, object string) {
 	}
 
 	//POST /service/ekjhsdfkjhsdfouejk/purge??
-	req, err := http.NewRequest(HTTPMethodPurge, FastlyAPIEndPoint+"/service/"+result.ID+"/"+object, nil)
+	req, err := http.NewRequest(HTTPMethodPurge, fastlyAPIEndPoint+"/service/"+result.ID+"/"+object, nil)
 	req.Header.Set(HeaderContentType, MIMEApplicationJSON)
 	req.Header.Set(HeaderFastlyKey, c.apiKey)
 
@@ -210,7 +210,7 @@ func (c *Client) PurgeAllObjects(serviceName string) {
 	}
 
 	//POST /service/ekjhsdfkjhsdfouejk/purge_all
-	req, err := http.NewRequest(http.MethodPost, FastlyAPIEndPoint+"/service/"+result.ID+"/purge_all", nil)
+	req, err := http.NewRequest(http.MethodPost, fastlyAPIEndPoint+"/service/"+result.ID+"/purge_all", nil)
 	req.Header.Set(HeaderContentType, MIMEApplicationJSON)
 	req.Header.Set(HeaderFastlyKey, c.apiKey)
 
@@ -233,7 +233,7 @@ func (c *Client) lookupServiceByName(serviceName string) (SearchResultModel, err
 	var service SearchResultModel
 
 	//GET /service/search?name={serviceName}
-	req, err := http.NewRequest(http.MethodGet, FastlyAPIEndPoint+"/service/search?name="+serviceName, nil)
+	req, err := http.NewRequest(http.MethodGet, fastlyAPIEndPoint+"/service/search?name="+serviceName, nil)
 	req.Header.Set(HeaderContentType, MIMEApplicationJSON)
 	req.Header.Set(HeaderFastlyKey, c.apiKey)
 
@@ -263,10 +263,10 @@ func (c *Client) isStringEmpty(s string) bool {
 }
 
 func (c *Client) getAPIKey() (string, error) {
-	if os.Getenv(FastlyAPIEnvironmentName) == "" {
+	if os.Getenv(fastlyAPIEnvironmentName) == "" {
 		return "", ErrorNoAPIKeySet
 	}
-	return os.Getenv(FastlyAPIEnvironmentName), nil
+	return os.Getenv(fastlyAPIEnvironmentName), nil
 }
 
 func (*Client) initHTTPClient() *http.Client {
