@@ -247,6 +247,10 @@ func (c *Client) lookupServiceByName(serviceName string) (SearchResultModel, err
 		return service, err
 	}
 
+	if response.StatusCode == http.StatusForbidden {
+		return service, ErrorAPIKeyDoesntHaveAccess
+	}
+
 	if response.StatusCode == http.StatusOK {
 		err := json.Unmarshal(body, &service)
 		if err != nil {

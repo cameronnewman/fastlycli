@@ -6,6 +6,9 @@ var (
 	//ErrorNoAPIKeySet Error when no API Key set
 	ErrorNoAPIKeySet = errors.New("Fastly API key not set. Please export $FASTLYAPIKEY=x")
 
+	//ErrorAPIKeyDoesntHaveAccess is when the API Keys doesnt have access to the account or services
+	ErrorAPIKeyDoesntHaveAccess = errors.New("API Key doesnt have access to account or Service. Please be aware that the API key needs to have `Read-only access (global:read)` to lookup services by name")
+
 	//ErrorNoServiceWithNameExists when no service found with described name
 	ErrorNoServiceWithNameExists = errors.New("No service called with name exists")
 
