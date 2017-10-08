@@ -3,6 +3,7 @@ sudo: false
 go:
   - 1.7
   - 1.8
+  - 1.9
 env:
   - GOARCH=amd64
 notifications:
