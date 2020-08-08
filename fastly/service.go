@@ -1,7 +1,82 @@
-package fastlyclient
+package fastly
 
-//SearchResultModel result struct from search by service name
-type SearchResultModel struct {
+import (
+	"encoding/json"
+)
+
+//GetService gets all details for a fastly service via it's friendly name
+func (f *Fastly) GetService(serviceName string) (string, error) {
+	service, err := f.getServiceByName(serviceName)
+	if err != nil {
+		return "", err
+	}
+
+	result, err := json.MarshalIndent(service, "", "\t")
+	if err != nil {
+		return "", err
+	}
+	return string(result), nil
+}
+
+//GetServiceDomains get public cnames for service
+func (f *Fastly) GetServiceDomains(serviceName string) (string, error) {
+	service, err := f.getServiceByName(serviceName)
+	if err != nil {
+		return "", err
+	}
+
+	result, err := json.MarshalIndent(service.ActiveVersion.Domains, "", "\t")
+	if err != nil {
+		return "", err
+	}
+	return string(result), nil
+}
+
+//GetServiceBackends get all backends for a service
+func (f *Fastly) GetServiceBackends(serviceName string) (string, error) {
+	service, err := f.getServiceByName(serviceName)
+	if err != nil {
+		return "", err
+	}
+
+	result, err := json.MarshalIndent(service.ActiveVersion.Backends, "", "\t")
+	if err != nil {
+		return "", err
+	}
+	return string(result), nil
+}
+
+func (f *Fastly) getServiceByName(serviceName string) (Service, error) {
+	var serviceSearch ServiceSearchResult
+	var service Service
+
+	//GET /service/search?name={serviceName}
+	body, err := f.get(fastlyAPIEndPoint + "/service/search?name=" + serviceName)
+	if err != nil {
+		return service, err
+	}
+
+	err = json.Unmarshal(body, &serviceSearch)
+	if err != nil {
+		return service, err
+	}
+
+	//GET /service/{serviceID}/details
+	body, err = f.get(fastlyAPIEndPoint + "/service/" + serviceSearch.ID + "/details")
+	if err != nil {
+		return service, err
+	}
+
+	err = json.Unmarshal(body, &service)
+	if err != nil {
+		return service, err
+	}
+
+	return service, nil
+}
+
+//ServiceSearchResult is a result from search by service name
+type ServiceSearchResult struct {
 	Comment    string `json:"comment"`
 	CustomerID string `json:"customer_id"`
 	ID         string `json:"id"`
@@ -40,14 +115,8 @@ type SearchResultModel struct {
 	} `json:"versions"`
 }
 
-//PurgeObjectResultModel result struct from purging an object
-type PurgeObjectResultModel struct {
-	Status string `json:"status"`
-	ID     string `json:"id"`
-}
-
-//ServiceModel result struct from a service details lookup
-type ServiceModel struct {
+//Service is a fastly service from details lookup
+type Service struct {
 	ActiveVersion struct {
 		Active   bool `json:"active"`
 		Backends []struct {

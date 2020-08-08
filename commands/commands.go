@@ -1,9 +1,10 @@
 package commands
 
 import (
+	"fmt"
 	"os"
 
-	"github.com/cameronnewman/fastlycli/fastlyclient"
+	"github.com/cameronnewman/fastlycli/fastly"
 	"github.com/urfave/cli"
 )
 
@@ -11,8 +12,8 @@ import (
 func Excute() {
 
 	app := cli.NewApp()
-	app.Name = "fastlycli"
-	app.Usage = "Manage Fastly CDN Services via the cli"
+	app.Name = "fastly"
+	app.Usage = "CLI to manage Fastly CDN Services"
 	app.Version = "0.9.0"
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{
@@ -36,8 +37,7 @@ func Excute() {
 					},
 					Action: func(c *cli.Context) {
 						if c.String("service") != "" {
-							fastly := fastlyclient.NewFastlyClient()
-							fastly.GetServiceDetails(c.String("service"))
+							print(fastly.New().GetService(c.String("service")))
 						}
 					},
 				},
@@ -52,8 +52,7 @@ func Excute() {
 					},
 					Action: func(c *cli.Context) {
 						if c.String("service") != "" {
-							fastly := fastlyclient.NewFastlyClient()
-							fastly.GetServiceDomains(c.String("service"))
+							print(fastly.New().GetServiceDomains(c.String("service")))
 						}
 					},
 				},
@@ -69,8 +68,7 @@ func Excute() {
 					},
 					Action: func(c *cli.Context) {
 						if c.String("service") != "" {
-							fastly := fastlyclient.NewFastlyClient()
-							fastly.GetServiceBackends(c.String("service"))
+							print(fastly.New().GetServiceBackends(c.String("service")))
 						}
 					},
 				},
@@ -91,8 +89,7 @@ func Excute() {
 			},
 			Action: func(c *cli.Context) {
 				if c.IsSet("service") && c.String("service") != "" {
-					fastly := fastlyclient.NewFastlyClient()
-					fastly.PurgeObject(c.String("service"), c.String("object"))
+					print(fastly.New().PurgeObject(c.String("service"), c.String("object")))
 				} else {
 					println("No service name defined")
 				}
@@ -109,8 +106,7 @@ func Excute() {
 			},
 			Action: func(c *cli.Context) {
 				if c.IsSet("service") && c.String("service") != "" {
-					fastly := fastlyclient.NewFastlyClient()
-					fastly.PurgeAllObjects(c.String("service"))
+					print(fastly.New().PurgeAllObjects(c.String("service")))
 				} else {
 					println("No service name defined")
 				}
@@ -118,5 +114,15 @@ func Excute() {
 		},
 	}
 
-	app.Run(os.Args)
+	err := app.Run(os.Args)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func print(r string, err error) {
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(r)
 }
