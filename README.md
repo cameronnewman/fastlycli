@@ -9,7 +9,7 @@ a simple CLI tool to interact with the Fastly CDN
 
 ```
 lappy:~ root$ export FASTLYAPIKEY=adkjsdfiousdksdfoiujsdflkjsdfjk
-lappy:~ root$ ./fastlycli service domains -service test.com
+lappy:~ root$ ./fastly service domains -service test.com
 [
 	{
 		"comment": "",
@@ -26,22 +26,22 @@ lappy:~ root$ ./fastlycli service domains -service test.com
 ]
 ```
 ```
-lappy:~ root$ ./fastlycli purge -service example.com -o http://www.example.com/js/main.js
+lappy:~ root$ ./fastly purge -service example.com -o http://www.example.com/js/main.js
 Service test.com successfully purged
 ```
 
 ```
-lappy:~ root$ ./fastlycli purgeall -service example.com
+lappy:~ root$ ./fastly purgeall -service example.com
 Service test.com successfully purged
 ```
 
 ```
-lappy:~ root$ fastlycli -h
+lappy:~ root$ fastly -h
 NAME:
-   fastlycli - Manage Fastly CDN Services via the cli
+   fastly - Manage Fastly CDN Services via the cli
 
 USAGE:
-   fastlycli [global options] command [command options] [arguments...]
+   fastly [global options] command [command options] [arguments...]
 
 VERSION:
    0.9.0
