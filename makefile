@@ -8,6 +8,7 @@ VERSION_HASH		:= ${VERSION}.${INTERNAL_BUILD_ID}-${SHA1_SHORT}
 
 BUILD_IMAGE			:= golang:1.14.6
 LINT_IMAGE			:= golangci/golangci-lint:v1.30.0
+SHELL_LINT_IMAGE	:= koalaman/shellcheck:latest
 
 ENVIRONMENT 		?= local
 
@@ -46,6 +47,11 @@ lint: version ## Runs more than 20 different linters using golangci-lint to ensu
 	-w /usr/src/app \
 	$(LINT_IMAGE) \
 	golangci-lint run --timeout=2m
+	
+	find . -name "*.sh" | xargs docker run --rm \
+	-v $(PWD):/usr/src/app \
+	-w /usr/src/app \
+	$(SHELL_LINT_IMAGE)
 
 	@echo "Completed Lint"
 
