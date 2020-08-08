@@ -1,10 +1,11 @@
 # fastlycli
 [![Build Status](https://travis-ci.org/cameronnewman/fastlycli.svg?branch=master)](https://travis-ci.org/cameronnewman/fastlycli) [![GoDoc](https://godoc.org/github.com/cameronnewman/fastlycli?status.svg)](http://godoc.org/github.com/cameronnewman/fastlycli) [![Report card](https://goreportcard.com/badge/github.com/cameronnewman/fastlycli)](https://goreportcard.com/report/github.com/cameronnewman/fastlycli)
 
+## Purpose ##
+
 a simple CLI tool to interact with the Fastly CDN
 
-
-Usage
+## Usage
 
 ```
 lappy:~ root$ export FASTLYAPIKEY=adkjsdfiousdksdfoiujsdflkjsdfjk
@@ -55,3 +56,9 @@ GLOBAL OPTIONS:
    --help, -h		show help
    --version, -v	print the version
 ```
+
+## Issues
+* None
+
+## License
+MIT Licensed
