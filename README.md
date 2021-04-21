@@ -3,7 +3,6 @@
 [![Build][1]][2]
 [![GoDoc][3]][4]
 [![Go Report Card][5]][6]
-[![codecov][7]][8]
 
 [1]: https://github.com/cameronnewman/fastlycli/workflows/Continuous%20Integration/badge.svg
 [2]: https://github.com/cameronnewman/fastlycli/actions
@@ -11,8 +10,6 @@
 [4]: http://godoc.org/github.com/cameronnewman/fastlycli
 [5]: https://goreportcard.com/badge/github.com/cameronnewman/fastlycli
 [6]: https://goreportcard.com/report/github.com/cameronnewman/fastlycli
-[7]: https://codecov.io/gh/cameronnewman/fastlycli/branch/master/graph/badge.svg
-[8]: https://codecov.io/gh/cameronnewman/fastlycli
 
 ## Purpose
 
